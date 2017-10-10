@@ -48,7 +48,7 @@ class HoneybadgerFlask(HoneybadgerExtension):
         :param bool report_exceptions: whether to automatically report exceptions on requests or not.
         """
         self.context_generators = context_generators
-        self.report_exception = report_exceptions
+        self.report_exceptions = report_exceptions
         self.initialize_honeybadger(app.config)
         self._patch_generic_request_payload()
         self.skip_headers = set(csv_to_list(app.config.get('HONEYBADGER_EXCLUDE_HEADERS', DEFAULT_SKIP_HEADERS)))
