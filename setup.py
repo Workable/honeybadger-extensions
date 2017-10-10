@@ -2,7 +2,7 @@
 Honeybadger-Extensions
 ======================
 
-**Honeybadger-Extensions** extend current `Honeybadger Python library  <https://github.com/honeybadger-io/honeybadger-python>`_ to better support `Celery`_ & `Flask`_.
+**Honeybadger-Extensions** extend current `Honeybadger Python library`_ to better support `Celery`_ & `Flask`_.
 
 It offers:
 
@@ -16,7 +16,8 @@ Features
 
 Honeybadger-Extensions provides the ``install_celery_handler()`` function which can be used
 at any time which can be used to initialize both Honeybadger & allow improved Honeybadger reporting. It also offers the
-``HoneybadgerFlask`` Flask extension that adds more information to Honeybadger logging, as well as automatic logging of errors raised in the view functions..
+``HoneybadgerFlask`` Flask extension that adds more information to Honeybadger logging, as well as automatic logging of
+errors raised in the view functions.
 
 Example 1: Initialize Celery
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -77,10 +78,10 @@ License
 
 See the `LICENSE`_ file for license rights and limitations (MIT).
 
+.. _Honeybadger Python Library: https://github.com/honeybadger-io/honeybadger-python
 .. _Flask: http://flask.pocoo.org/
 .. _Celery: http://www.celeryproject.org/
 .. _LICENSE: https://github.com/Workable/honeybadger-extensions/blob/master/LICENSE.md
-
 """
 import re
 import ast
