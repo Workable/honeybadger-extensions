@@ -36,6 +36,18 @@ class CeleryHoneybadgerFailureHandler(HoneybadgerExtension):
         logger.info('Registered Celery signal handlers')
 
     def _failure_handler(self, sender, task_id, exception, args, kwargs, traceback, einfo, **kw):
+        """
+        Handle failures.
+        :param celery.Task sender: the task object sending the error.
+        :param str task_id: the id of the task reporting the exception.
+        :param Exception exception: the exception instance raised.
+        :param list args: positional arguments the task was called with.
+        :param dict kwargs: keyword arguments the task was called with.
+        :param traceback: stack trace object.
+        :param billiard.einfo.ExceptionInfo einfo: The billiard.einfo.ExceptionInfo instance.
+
+        :param dict kw: any other arguments
+        """
         self.handle_exception(exception=exception)
 
     def _patch_generic_request_payload(self):

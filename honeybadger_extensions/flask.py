@@ -56,7 +56,7 @@ class HoneybadgerFlask(HoneybadgerExtension):
         request_tearing_down.connect(self.reset_context, sender=app, weak=False)
         logger.info('Honeybadger Flask helper installed')
 
-        if self.report_exception:
+        if self.report_exceptions:
             logger.info('Enabling auto-reporting exceptions')
             got_request_exception.connect(self._handle_exception, sender=app, weak=False)
 

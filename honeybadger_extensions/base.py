@@ -33,8 +33,7 @@ class HoneybadgerExtension(object):
             honeybadger.configure(api_key=api_key,
                                   environment=config.get('HONEYBADGER_ENVIRONMENT', 'development'),
                                   params_filters=csv_to_list(config.get('HONEYBADGER_PARAMS_FILTERS',
-                                                                        'password,password_confirmation,credit_card')),
-
+                                                                        'password,password_confirmation,credit_card'))
                                   )
             logging.getLogger('honeybadger').addHandler(logging.StreamHandler())
             return True
