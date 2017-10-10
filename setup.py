@@ -120,8 +120,8 @@ setup(
     platforms='any',
     install_requires=[
         'honeybadger>=0.0.6',
-        'blinker>=1.1'
-        'flask>=0.8',
+        'blinker>=1.1',
+        'Flask>=0.8',
         'celery~=4.1.0'
     ],
     tests_require=test_requirements,
