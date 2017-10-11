@@ -2,7 +2,9 @@
 Honeybadger-Extensions
 ======================
 
-**Honeybadger-Extensions** extend current `Honeybadger Python library  <https://github.com/honeybadger-io/honeybadger-python>`_ to better support `Celery`_ & `Flask`_.
+|CircleCI|
+
+**Honeybadger-Extensions** extend current `Honeybadger Python library`_ to better support `Celery`_ & `Flask`_.
 
 It offers:
 
@@ -16,7 +18,8 @@ Features
 
 Honeybadger-Extensions provides the ``install_celery_handler()`` function which can be used
 at any time which can be used to initialize both Honeybadger & allow improved Honeybadger reporting. It also offers the
-``HoneybadgerFlask`` Flask extension that adds more information to Honeybadger logging, as well as automatic logging of errors raised in the view functions..
+``HoneybadgerFlask`` Flask extension that adds more information to Honeybadger logging, as well as automatic logging of
+errors raised in the view functions.
 
 Example 1: Initialize Celery
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -77,9 +80,12 @@ License
 
 See the `LICENSE`_ file for license rights and limitations (MIT).
 
+.. _Honeybadger Python Library: https://github.com/honeybadger-io/honeybadger-python
 .. _Flask: http://flask.pocoo.org/
 .. _Celery: http://www.celeryproject.org/
 .. _LICENSE: https://github.com/Workable/honeybadger-extensions/blob/master/LICENSE.md
+.. |CircleCI| image:: https://img.shields.io/circleci/project/github/Workable/honeybadger-extensions.svg
+   :target: https://circleci.com/gh/Workable/honeybadger-extensions
 
 """
 import re
@@ -119,8 +125,8 @@ setup(
     platforms='any',
     install_requires=[
         'honeybadger>=0.0.6',
-        'blinker>=1.1'
-        'flask>=0.8',
+        'blinker>=1.1',
+        'Flask>=0.8',
         'celery~=4.1.0'
     ],
     tests_require=test_requirements,

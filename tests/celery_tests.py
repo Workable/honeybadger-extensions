@@ -17,7 +17,7 @@ class ConnectFailureHandlerTestCase(unittest.TestCase):
         uninstall_celery_handler()
 
     def assert_send_notice_once_with(self, mock_send_notice, component, action, params, cgi_data, context):
-        mock_send_notice.assert_called_once()
+        self.assertEqual(1, mock_send_notice.call_count, msg='send_notice should be called exactly once')
         actual = mock_send_notice.call_args[0][1]['request']
         self.assertEqual(component, actual['component'], msg='Incorrect component')
         self.assertEqual(action, actual['action'], msg='Incorrect action')
