@@ -206,7 +206,7 @@ workflows:
           filters:
             branches:
               only:
-                  - staging
+                  - deploy/staging
           requires:
             - build
 
