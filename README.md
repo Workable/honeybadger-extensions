@@ -1,6 +1,8 @@
 
 # Honeybadger-Extensions
 
+[![CircleCI](https://img.shields.io/circleci/project/github/Workable/honeybadger-extensions.svg)](https://circleci.com/gh/Workable/honeybadger-extensions)
+
 **Honeybadger-Extensions** extend current [Honeybadger Python library](https://github.com/honeybadger-io/honeybadger-python) to better
 support [Celery](http://www.celeryproject.org/) & [Flask](http://flask.pocoo.org). It offers:
 

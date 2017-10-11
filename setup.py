@@ -2,6 +2,8 @@
 Honeybadger-Extensions
 ======================
 
+|CircleCI|
+
 **Honeybadger-Extensions** extend current `Honeybadger Python library`_ to better support `Celery`_ & `Flask`_.
 
 It offers:
@@ -82,6 +84,9 @@ See the `LICENSE`_ file for license rights and limitations (MIT).
 .. _Flask: http://flask.pocoo.org/
 .. _Celery: http://www.celeryproject.org/
 .. _LICENSE: https://github.com/Workable/honeybadger-extensions/blob/master/LICENSE.md
+.. |CircleCI| image:: https://img.shields.io/circleci/project/github/Workable/honeybadger-extensions.svg
+   :target: https://circleci.com/gh/Workable/honeybadger-extensions
+
 """
 import re
 import ast
