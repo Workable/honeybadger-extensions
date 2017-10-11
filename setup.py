@@ -38,6 +38,7 @@ In the following example, we will use the ``install_celery_handler`` to setup Ho
     })
 
     install_celery_handler(config=celery.conf, report_exceptions=True)
+ 
 
 Example 2: Initialize Flask
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
