@@ -18,7 +18,7 @@ class HoneybadgerFlaskTestCase(unittest.TestCase):
         }
 
     def assert_send_notice_once_with(self, mock_send_notice, url, component, action, params, session, cgi_data, context):
-        mock_send_notice.assert_called_once()
+        self.assertEqual(1, mock_send_notice.call_count, msg='send_notice should be called exactly once')
         actual = mock_send_notice.call_args[0][1]['request']
         self.assertEqual(url, actual['url'], msg='URL not matching')
         self.assertEqual(component, actual['component'], msg='Incorrect component')
