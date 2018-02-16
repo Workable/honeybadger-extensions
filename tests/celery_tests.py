@@ -1,3 +1,4 @@
+import os
 import unittest
 from unittest.mock import patch
 from celery import Celery
@@ -12,6 +13,7 @@ class ConnectFailureHandlerTestCase(unittest.TestCase):
         super(ConnectFailureHandlerTestCase, self).setUp()
         self.celery = Celery(__name__)
         self.celery.conf.CELERY_ALWAYS_EAGER = True
+        os.environ['HONEYBADGER_ENVIRONMENT'] = 'celery_test'
 
     def tearDown(self):
         uninstall_celery_handler()
@@ -25,7 +27,7 @@ class ConnectFailureHandlerTestCase(unittest.TestCase):
         self.assertDictEqual(cgi_data, actual['cgi_data'], msg='Different headers')
         self.assertDictEqual(context, actual['context'], msg='Different context')
 
-    @patch('honeybadger.core.send_notice')
+    @patch('honeybadger.connection.send_notice')
     def test_without_generators(self, mock_send_notice):
         install_celery_handler(self.celery.conf, report_exceptions=True)
 
@@ -41,7 +43,7 @@ class ConnectFailureHandlerTestCase(unittest.TestCase):
                                           {'task_id': 'abc', 'retries': 0, 'max_retries': 3},
                                           {})
 
-    @patch('honeybadger.core.send_notice')
+    @patch('honeybadger.connection.send_notice')
     def test_auto_report_disabled(self, mock_send_notice):
         install_celery_handler(self.celery.conf, report_exceptions=False)
 
@@ -52,7 +54,7 @@ class ConnectFailureHandlerTestCase(unittest.TestCase):
         dummy_task.apply_async(args=(1,), kwargs={'y': 0}, task_id='abc')
         mock_send_notice.assert_not_called()
 
-    @patch('honeybadger.core.send_notice')
+    @patch('honeybadger.connection.send_notice')
     def test_with_generators(self, mock_send_notice):
         install_celery_handler(config=self.celery.conf, context_generators={
             'ringbearer': lambda: 'frodo'
@@ -71,7 +73,7 @@ class ConnectFailureHandlerTestCase(unittest.TestCase):
                                           {'task_id': 'abc', 'retries': 0, 'max_retries': 3},
                                           {'ringbearer': 'frodo'})
 
-    @patch('honeybadger.core.send_notice')
+    @patch('honeybadger.connection.send_notice')
     def test_custom_notify_with_generators(self, mock_send_notice):
         install_celery_handler(config=self.celery.conf, context_generators={
             'ringbearer': lambda: 'frodo'
@@ -93,7 +95,7 @@ class ConnectFailureHandlerTestCase(unittest.TestCase):
                                           {'task_id': 'abc', 'retries': 0, 'max_retries': 3},
                                           {'ringbearer': 'frodo', 'q': 3})
 
-    @patch('honeybadger.core.send_notice')
+    @patch('honeybadger.connection.send_notice')
     def test_with_named_task(self, mock_send_notice):
         install_celery_handler(self.celery.conf, report_exceptions=True)
 
