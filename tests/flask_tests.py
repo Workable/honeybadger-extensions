@@ -1,5 +1,6 @@
 import unittest
 import flask
+import werkzeug
 
 from unittest.mock import patch
 
@@ -9,15 +10,20 @@ from honeybadger_extensions import HoneybadgerFlask
 
 
 class HoneybadgerFlaskTestCase(unittest.TestCase):
+
     def setUp(self):
         self.default_headers = {
            'Content-Length': '0',
-           'Content-Type': '',
            'Host': 'localhost',
-           'User-Agent': 'werkzeug/0.12.2'
+           'User-Agent': 'werkzeug/%s' % werkzeug.__version__
         }
+        self.app = flask.Flask(__name__)
+        self.app.config.update({
+            'HONEYBADGER_ENVIRONMENT': 'production_flask'
+        })
 
-    def assert_send_notice_once_with(self, mock_send_notice, url, component, action, params, session, cgi_data, context):
+    def assert_send_notice_once_with(self, mock_send_notice, url, component, action, params, session, cgi_data,
+                                     context):
         self.assertEqual(1, mock_send_notice.call_count, msg='send_notice should be called exactly once')
         actual = mock_send_notice.call_args[0][1]['request']
         self.assertEqual(url, actual['url'], msg='URL not matching')
@@ -28,16 +34,15 @@ class HoneybadgerFlaskTestCase(unittest.TestCase):
         self.assertDictEqual(cgi_data, actual['cgi_data'], msg='Different headers')
         self.assertDictEqual(context, actual['context'], msg='Different context')
 
-    @patch('honeybadger.core.send_notice')
+    @patch('honeybadger.connection.send_notice')
     def test_without_generators(self, mock_send_notice):
-        app = flask.Flask(__name__)
-        HoneybadgerFlask(app, report_exceptions=True)
+        HoneybadgerFlask(self.app, report_exceptions=True)
 
-        @app.route('/error')
+        @self.app.route('/error')
         def error():
             return 1 / 0
 
-        app.test_client().get('/error?a=1&b=2&b=3')
+        self.app.test_client().get('/error?a=1&b=2&b=3')
 
         self.assert_send_notice_once_with(mock_send_notice,
                                           url='http://localhost/error',
@@ -48,18 +53,17 @@ class HoneybadgerFlaskTestCase(unittest.TestCase):
                                           cgi_data=self.default_headers,
                                           context={})
 
-    @patch('honeybadger.core.send_notice')
+    @patch('honeybadger.connection.send_notice')
     def test_with_generators(self, mock_send_notice):
-        app = flask.Flask(__name__)
-        HoneybadgerFlask(app, report_exceptions=True, context_generators={
+        HoneybadgerFlask(self.app, report_exceptions=True, context_generators={
             'ringbearer': lambda: 'bilbo'
         })
 
-        @app.route('/error')
+        @self.app.route('/error')
         def error():
             return 1 / 0
 
-        app.test_client().get('/error?a=1&b=2&b=3')
+        self.app.test_client().get('/error?a=1&b=2&b=3')
 
         self.assert_send_notice_once_with(mock_send_notice,
                                           url='http://localhost/error',
@@ -70,16 +74,15 @@ class HoneybadgerFlaskTestCase(unittest.TestCase):
                                           cgi_data=self.default_headers,
                                           context={'ringbearer': 'bilbo'})
 
-    @patch('honeybadger.core.send_notice')
+    @patch('honeybadger.connection.send_notice')
     def test_with_headers(self, mock_send_notice):
-        app = flask.Flask(__name__)
-        HoneybadgerFlask(app, report_exceptions=True)
+        HoneybadgerFlask(self.app, report_exceptions=True)
 
-        @app.route('/error')
+        @self.app.route('/error')
         def error():
             return 1 / 0
 
-        app.test_client().get('/error', headers={'X-Wizard-Color': 'grey', 'Authorization': 'Bearer 123'})
+        self.app.test_client().get('/error', headers={'X-Wizard-Color': 'grey', 'Authorization': 'Bearer 123'})
 
         expected_headers = {'X-Wizard-Color': 'grey'}
         expected_headers.update(self.default_headers)
@@ -93,30 +96,29 @@ class HoneybadgerFlaskTestCase(unittest.TestCase):
                                           cgi_data=expected_headers,
                                           context={})
 
-    @patch('honeybadger.core.send_notice')
+    @patch('honeybadger.connection.send_notice')
     def test_without_auto_reporting(self, mock_send_notice):
-        app = flask.Flask(__name__)
-        HoneybadgerFlask(app)
+        self.app = flask.Flask(__name__)
+        HoneybadgerFlask(self.app)
 
-        @app.route('/error')
+        @self.app.route('/error')
         def error():
             return 1 / 0
 
-        app.test_client().get('/error')
+        self.app.test_client().get('/error')
 
         mock_send_notice.assert_not_called()
 
-    @patch('honeybadger.core.send_notice')
+    @patch('honeybadger.connection.send_notice')
     def test_with_additional_skip_headers(self, mock_send_notice):
-        app = flask.Flask(__name__)
-        app.config.update(HONEYBADGER_EXCLUDE_HEADERS='Authorization, X-Dark-Land')
-        HoneybadgerFlask(app, report_exceptions=True)
+        self.app.config.update(HONEYBADGER_EXCLUDE_HEADERS='Authorization, X-Dark-Land')
+        HoneybadgerFlask(self.app, report_exceptions=True)
 
-        @app.route('/error')
+        @self.app.route('/error')
         def error():
             return 1 / 0
 
-        app.test_client().get('/error', headers={
+        self.app.test_client().get('/error', headers={
             'X-Wizard-Color': 'grey',
             'Authorization': 'Bearer 123',
             'X-Dark-Land': 'Mordor'
@@ -134,33 +136,31 @@ class HoneybadgerFlaskTestCase(unittest.TestCase):
                                           cgi_data=expected_headers,
                                           context={})
 
-    @patch('honeybadger.core.send_notice')
+    @patch('honeybadger.connection.send_notice')
     def test_do_not_report(self, mock_send_notice):
-        app = flask.Flask(__name__)
-        HoneybadgerFlask(app)
+        HoneybadgerFlask(self.app)
 
-        @app.route('/error')
+        @self.app.route('/error')
         def error():
             return 1 / 0
 
-        app.test_client().get('/error?a=1&b=2&b=3')
+        self.app.test_client().get('/error?a=1&b=2&b=3')
 
         mock_send_notice.assert_not_called()
 
-    @patch('honeybadger.core.send_notice')
+    @patch('honeybadger.connection.send_notice')
     def test_with_blueprint(self, mock_send_notice):
-        app = flask.Flask(__name__)
         bp = Blueprint('blueprint', __name__)
 
         @bp.route('/error')
         def error():
             return 1 / 0
 
-        app.register_blueprint(bp)
+        self.app.register_blueprint(bp)
 
-        HoneybadgerFlask(app, report_exceptions=True)
+        HoneybadgerFlask(self.app, report_exceptions=True)
 
-        app.test_client().get('/error?a=1&b=2&b=3')
+        self.app.test_client().get('/error?a=1&b=2&b=3')
 
         self.assert_send_notice_once_with(mock_send_notice,
                                           url='http://localhost/error',
@@ -171,19 +171,18 @@ class HoneybadgerFlaskTestCase(unittest.TestCase):
                                           cgi_data=self.default_headers,
                                           context={})
 
-    @patch('honeybadger.core.send_notice')
+    @patch('honeybadger.connection.send_notice')
     def test_with_view_class(self, mock_send_notice):
-        app = flask.Flask(__name__)
 
         class ErrorView(MethodView):
             def get(self):
                 return 1 / 0
 
-        app.add_url_rule('/error', view_func=ErrorView.as_view('error'))
+        self.app.add_url_rule('/error', view_func=ErrorView.as_view('error'))
 
-        HoneybadgerFlask(app, report_exceptions=True)
+        HoneybadgerFlask(self.app, report_exceptions=True)
 
-        app.test_client().get('/error?a=1&b=2&b=3')
+        self.app.test_client().get('/error?a=1&b=2&b=3')
 
         self.assert_send_notice_once_with(mock_send_notice,
                                           url='http://localhost/error',
@@ -194,17 +193,16 @@ class HoneybadgerFlaskTestCase(unittest.TestCase):
                                           cgi_data=self.default_headers,
                                           context={})
 
-    @patch('honeybadger.core.send_notice')
+    @patch('honeybadger.connection.send_notice')
     def test_post_form(self, mock_send_notice):
-        app = flask.Flask(__name__)
-        app.config.update(HONEYBADGER_API_KEY='abcd', HONEYBADGER_PARAMS_FILTERS='skip,password')
-        HoneybadgerFlask(app, report_exceptions=True)
+        self.app.config.update(HONEYBADGER_API_KEY='abcd', HONEYBADGER_PARAMS_FILTERS='skip,password')
+        HoneybadgerFlask(self.app, report_exceptions=True)
 
-        @app.route('/error', methods=['POST'])
+        @self.app.route('/error', methods=['POST'])
         def error():
             return 1 / 0
 
-        app.test_client().post('/error?a=1&b=2&b=3', data={
+        self.app.test_client().post('/error?a=1&b=2&b=3', data={
             'foo': 'bar',
             'password': 'qwerty',
             'a': 'newvalue',
@@ -227,26 +225,27 @@ class HoneybadgerFlaskTestCase(unittest.TestCase):
                                               'Content-Length': '46',
                                               'Content-Type': 'application/x-www-form-urlencoded',
                                               'Host': 'localhost',
-                                              'User-Agent': 'werkzeug/0.12.2'
+                                              'User-Agent': 'werkzeug/%s' % werkzeug.__version__
                                           },
                                           context={})
 
-    @patch('honeybadger.core.send_notice')
+    @patch('honeybadger.connection.send_notice')
     def test_session(self, mock_send_notice):
-        app = flask.Flask(__name__)
-        app.config.update(HONEYBADGER_API_KEY='abcd',
-                          HONEYBADGER_PARAMS_FILTERS='skip,password',
-                          SECRET_KEY='key')
-        HoneybadgerFlask(app, report_exceptions=True)
+        self.app.config.update(dict(
+            HONEYBADGER_API_KEY='abcd',
+            HONEYBADGER_PARAMS_FILTERS='skip,password',
+            SECRET_KEY='key'
+        ))
+        HoneybadgerFlask(self.app, report_exceptions=True)
 
-        @app.route('/error')
+        @self.app.route('/error')
         def error():
             session['answer'] = '42'
             session['password'] = 'this is fine'
 
             1 / 0
 
-        app.test_client().get('/error?a=1&b=2&b=3')
+        self.app.test_client().get('/error?a=1&b=2&b=3')
 
         self.assert_send_notice_once_with(mock_send_notice,
                                           url='http://localhost/error',
