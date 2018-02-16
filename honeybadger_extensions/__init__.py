@@ -2,7 +2,7 @@ from .celery import CeleryHoneybadgerFailureHandler
 from .flask import HoneybadgerFlask
 
 
-__version__ = '0.1.0'
+__version__ = '0.1.2'
 
 celery_handler = CeleryHoneybadgerFailureHandler()
 
