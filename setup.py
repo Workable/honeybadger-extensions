@@ -125,7 +125,7 @@ setup(
     include_package_data=True,
     platforms='any',
     install_requires=[
-        'honeybadger>=0.0.6',
+        'honeybadger==0.1.2',
         'blinker>=1.1',
         'Flask>=0.8',
         'celery~=4.1.0'
