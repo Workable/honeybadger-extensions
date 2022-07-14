@@ -125,10 +125,10 @@ setup(
     include_package_data=True,
     platforms='any',
     install_requires=[
-        'honeybadger==0.1.2',
+        'honeybadger>=0.1.2',
         'blinker>=1.1',
         'Flask>=0.8',
-        'celery~=4.1.0'
+        'celery>=4.1.0'
     ],
     tests_require=test_requirements,
     setup_requires=[
@@ -137,7 +137,7 @@ setup(
     ],
     extras_require={
         'test': test_requirements,
-        'celery': ["celery~=4.1.0"],
+        'celery': ["celery>=4.1.0"],
     },
     test_suite='nose.collector',
     classifiers=[
